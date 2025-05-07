@@ -24,22 +24,31 @@ public class Server{
 //                    """;
 
     public void processing(){
-        try{
+        try {
             server = AsynchronousServerSocketChannel.open().bind(new InetSocketAddress("127.0.0.1", 8080));
 
-            while (true){
+            while (true) {
                 Future<AsynchronousSocketChannel> future = server.accept();
-                handleClient(future);
+                System.out.println("accept connection");
+                try {
+                    handleClient(future);
+                } catch (TimeoutException e) {
+                    System.out.println("Accept timed out");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
+
     private void handleClient(Future<AsynchronousSocketChannel> future) throws ExecutionException, InterruptedException, TimeoutException, IOException{
 
-        AsynchronousSocketChannel clientChannel = future.get(60, TimeUnit.SECONDS);
+        AsynchronousSocketChannel clientChannel = future.get();
+        System.out.println("new clientChannel");
 
         if (clientChannel == null || !clientChannel.isOpen()){
             return;
@@ -50,6 +59,7 @@ public class Server{
         while (keepAlive && clientChannel.isOpen()){
             String rawRequest = readFullRequest(clientChannel);
             if (rawRequest == null || rawRequest.isEmpty()){
+                System.out.println("empty request");
                 break;
             }
 
@@ -86,7 +96,7 @@ public class Server{
         boolean headersParsed = false;
 
         while (true){
-            int bytesRead = clientChannel.read(buffer).get();
+            int bytesRead = clientChannel.read(buffer).get(30, TimeUnit.SECONDS);
             if (bytesRead <= 0){
                 break;
             }
