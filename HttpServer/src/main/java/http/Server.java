@@ -26,10 +26,11 @@ public class Server{
     public void processing(){
         try {
             server = AsynchronousServerSocketChannel.open().bind(new InetSocketAddress("127.0.0.1", 8080));
+            System.out.println("http://localhost:8080");
 
             while (true) {
                 Future<AsynchronousSocketChannel> future = server.accept();
-                System.out.println("accept connection");
+
                 try {
                     handleClient(future);
                 } catch (TimeoutException e) {
@@ -59,7 +60,6 @@ public class Server{
         while (keepAlive && clientChannel.isOpen()){
             String rawRequest = readFullRequest(clientChannel);
             if (rawRequest == null || rawRequest.isEmpty()){
-                System.out.println("empty request");
                 break;
             }
 

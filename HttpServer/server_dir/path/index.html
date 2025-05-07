@@ -1,10 +1,186 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Hello World</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Элегантные часы</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .clock-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Аналоговые часы */
+        .analog-clock {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        .hand {
+            position: absolute;
+            left: 50%;
+            bottom: 50%;
+            transform-origin: 50% 100%;
+            border-radius: 10px;
+        }
+
+        .hour-hand {
+            width: 6px;
+            height: 70px;
+            background: linear-gradient(to top, #ff6b6b, #ff8e8e);
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+        }
+
+        .minute-hand {
+            width: 4px;
+            height: 100px;
+            background: linear-gradient(to top, #4ecdc4, #88f0e9);
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+        }
+
+        .second-hand {
+            width: 2px;
+            height: 120px;
+            background: linear-gradient(to top, #f8e1e1, #ffffff);
+            transform: translateX(-50%);
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        .center-circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Цифровые часы */
+        .digital-clock {
+            position: absolute;
+            bottom: -60px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 2rem;
+            color: white;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .date {
+            position: absolute;
+            top: -60px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 2px;
+        }
+
+        /* Деления часов */
+        .markings {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .marking {
+            position: absolute;
+            width: 2px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.3);
+            left: 50%;
+            transform-origin: 50% 150px;
+        }
+    </style>
 </head>
 <body>
+<div class="clock-container">
+    <div class="date" id="date"></div>
+    <div class="analog-clock">
+        <div class="markings" id="markings"></div>
+        <div class="hand hour-hand" id="hour-hand"></div>
+        <div class="hand minute-hand" id="minute-hand"></div>
+        <div class="hand second-hand" id="second-hand"></div>
+        <div class="center-circle"></div>
+    </div>
+    <div class="digital-clock" id="digital-clock"></div>
+</div>
 
+<script>
+    // Создаем деления на часах
+    const markingsContainer = document.getElementById('markings');
+    for (let i = 0; i < 60; i++) {
+        const marking = document.createElement('div');
+        marking.className = 'marking';
+        marking.style.transform = `translateX(-50%) rotate(${i * 6}deg)`;
+        if (i % 5 === 0) {
+            marking.style.height = '18px';
+            marking.style.background = 'rgba(255, 255, 255, 0.7)';
+        }
+        markingsContainer.appendChild(marking);
+    }
+
+    function updateClock() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        // Аналоговые часы
+        const hourHand = document.getElementById('hour-hand');
+        const minuteHand = document.getElementById('minute-hand');
+        const secondHand = document.getElementById('second-hand');
+
+        const hourDegrees = (hours % 12) * 30 + minutes * 0.5;
+        const minuteDegrees = minutes * 6;
+        const secondDegrees = seconds * 6;
+
+        hourHand.style.transform = `translateX(-50%) rotate(${hourDegrees}deg)`;
+        minuteHand.style.transform = `translateX(-50%) rotate(${minuteDegrees}deg)`;
+        secondHand.style.transform = `translateX(-50%) rotate(${secondDegrees}deg)`;
+
+        // Цифровые часы
+        const digitalClock = document.getElementById('digital-clock');
+        digitalClock.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+        // Дата
+        const dateElement = document.getElementById('date');
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateElement.textContent = now.toLocaleDateString('ru-RU', options);
+    }
+
+    // Обновляем часы каждую секунду
+    updateClock();
+    setInterval(updateClock, 1000);
+</script>
 </body>
 </html>

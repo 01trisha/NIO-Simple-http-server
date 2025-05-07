@@ -94,9 +94,10 @@ public class HttpResponse{
                     }
                 }
             }
-        } catch (IOException e) {
+        }catch (IOException e) {
             throw e;
         }
+
         return "application/octet-stream";
     }
 }
