@@ -86,7 +86,7 @@ public class Server{
         boolean headersParsed = false;
 
         while (true){
-            int bytesRead = clientChannel.read(buffer).get(60, TimeUnit.SECONDS);
+            int bytesRead = clientChannel.read(buffer).get();
             if (bytesRead <= 0){
                 break;
             }
@@ -128,7 +128,5 @@ public class Server{
         }
         return requestBuilder.toString();
     }
-
-
 }
 
