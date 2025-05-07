@@ -81,25 +81,22 @@ public class HttpResponse{
         return header + responseBody;
     }
 
-    private String getMimeType(String path){
-        Map<String, String> mimeMap = new HashMap<>();
-        mimeMap.put("html", "text/html");
-        mimeMap.put("txt", "text/plain");
-        mimeMap.put("css", "text/css");
-        mimeMap.put("js", "application/javascript");
-        mimeMap.put("json", "application/json");
-        mimeMap.put("png", "image/png");
-        mimeMap.put("jpg", "image/jpeg");
-        mimeMap.put("jpeg", "image/jpeg");
-
-        String extension;
-
-        if (path.contains(".")){
-            extension = path.substring(path.lastIndexOf('.') + 1);
-        }else{
-            extension = "";
+    private String getMimeType(String path) throws IOException {
+        try {
+            File file = new File(SERVER_DIR + path);
+            if (!path.contains(".")){
+                return "application/octet-stream";
+            }else{
+                if (file.exists()) {
+                    String mimeType = Files.probeContentType(file.toPath());
+                    if (mimeType != null) {
+                        return mimeType;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw e;
         }
-
-        return mimeMap.getOrDefault(extension, "application/octet-stream");
+        return "application/octet-stream";
     }
 }
